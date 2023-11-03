@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "localizer.helloWorld",
-        "title": "Hello World"
+        "command": "wsus.localizer",
+        "title": "Wsus: Localizer"
       }
     ]
   },
