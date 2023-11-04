@@ -2,6 +2,7 @@
   "name": "wsuslaravellocalizer",
   "displayName": "wus laravel localizer",
   "description": "A vs code extension to wrap blade static texts in laravel localization syntax.",
+  "icon": "./images/icon.png",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.84.0"
