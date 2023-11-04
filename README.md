@@ -1,3 +1,5 @@
+![banner](https://github.com/shakilahmed0369/Wsus-Localizer-Vs-Code-Extension/assets/51516043/5fc88d9f-79c4-4987-be27-0b11838ec417)
+
 # Laravel Blade Localization Wrapper Extension
 
 This extension will help you to auto select all your blade static strings and wrap those into localization syntax.
