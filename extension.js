@@ -2,8 +2,6 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
 const cheerio = require("cheerio");
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 
 function extractTextFromCode(codeContent) {
   const content = codeContent;
@@ -27,6 +25,7 @@ function extractTextFromCode(codeContent) {
   return trimmer($.html());
 }
 
+// Trim or replace unneeded contents
 function trimmer(content) {
   var trimmedContent = content;
 
@@ -41,6 +40,8 @@ function trimmer(content) {
   return trimmedContent;
 }
 
+// This method is called when your extension is activated
+// Your extension is activated the very first time the command is executed
 /**
  * @param {vscode.ExtensionContext} context
  */
@@ -57,9 +58,6 @@ function activate(context) {
     function () {
       // The code you place here will be executed every time your command is executed
 
-      // Display a message box to the user
-      // vscode.window.showInformationMessage('Hello World from localizer!');
-
       // Get the active text editor
       const editor = vscode.window.activeTextEditor;
 
@@ -69,7 +67,7 @@ function activate(context) {
         const content = document.getText();
 
         const replacedContents = extractTextFromCode(content);
-        
+
         // Replace content
         const edit = new vscode.WorkspaceEdit();
         edit.replace(
