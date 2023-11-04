@@ -1,16 +1,19 @@
 {
   "name": "wsuslaravellocalizer",
-  "displayName": "wus laravel localizer",
+  "displayName": "Wsus laravel localizer",
   "description": "A vs code extension to wrap blade static texts in laravel localization syntax.",
+  "publisher": "ShakilAhmed",
   "icon": "./images/icon.png",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.84.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:wsus.localizer"
+  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
@@ -36,9 +39,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12",
-    "xmldom": "^0.6.0",
-    "xpath": "^0.0.33"
+    "cheerio": "^1.0.0-rc.12"
   },
   "repository": {
     "type": "git",
