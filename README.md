@@ -3,8 +3,8 @@
 This extension will help you to auto select all your blade static strings and wrap those into localization syntax.
 
 ## Screenshot
-![Uploading demo.gif…]()
 
+![demo](https://github.com/shakilahmed0369/Wsus-Localizer-Vs-Code-Extension/assets/51516043/da98842a-d832-447a-9513-968c4589b89e)
 
 ## Features
 
