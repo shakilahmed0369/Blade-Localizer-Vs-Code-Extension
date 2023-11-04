@@ -69,21 +69,23 @@ function activate(context) {
         const content = document.getText();
 
         const replacedContents = extractTextFromCode(content);
-
+        
+        // Replace content
         const edit = new vscode.WorkspaceEdit();
-		  edit.replace(
-		  document.uri,
+        edit.replace(
+          document.uri,
           new vscode.Range(
             document.positionAt(0), // Start of the content
             document.positionAt(content.length) // End of the content
           ),
           replacedContents
-		);
-		  
-		  vscode.workspace.applyEdit(edit).then(() => {
-			  vscode.window.showInformationMessage("Content Replaced Successfully!");
-		  });
-		  
+        );
+
+        vscode.workspace.applyEdit(edit).then(() => {
+          vscode.window.showInformationMessage(
+            "Content Replaced Successfully!"
+          );
+        });
       } else {
         vscode.window.showErrorMessage("No active text editor found.");
       }

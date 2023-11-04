@@ -1,65 +1,40 @@
-# localizer README
+# Laravel Blade Localization Wrapper Extension
 
-This is the README for your extension "localizer". After writing up a brief description, we recommend including the following sections.
+This extension will help you to auto select all your blade static strings and wrap those into localization syntax.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+* Wrap static strings with Laravel localization syntax on click.
+* Auto detect static strings from file.
+* Auto ignore strings that have special characters.
+* Blazing Fast.
 
-For example if there is an image subfolder under your extension project workspace:
+## Installation
 
-\!\[feature X\]\(images/feature-x.png\)
+1. Open Visual Studio Code.
+2. Click the Extensions icon (the four squares icon) in the Activity Bar.
+3. Search for "Wsus Laravel Localizer".
+4. Click the Install button next to the extension.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Usage
 
-## Requirements
+1. Open a Laravel Blade file in Visual Studio Code.
+4. Press `Ctrl`+`Shift`+`P` to open the Command Palette.
+5. Type "Wsus: Laravel Localizer" and select the command and execute.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## Example
 
-## Extension Settings
+```blade
+<h1>Hello world!</h1>
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+<h1>{{__('Hello world!')}}</h1>
+```
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Some time some string can be skipped from auto detection depending on your
+code structure. 
+As this is a beta release of this extension so there could be some bug. Make sure you always give a basic check your code after running the extension.
 
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+## Feedback
+If you have any feedback or suggestions, please feel free to create an issue on the repository.

@@ -1,7 +1,7 @@
 {
-  "name": "localizer",
-  "displayName": "localizer",
-  "description": "",
+  "name": "wsuslaravellocalizer",
+  "displayName": "wus laravel localizer",
+  "description": "A vs code extension to wrap blade static texts in laravel localization syntax.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.84.0"
@@ -15,9 +15,9 @@
     "commands": [
       {
         "command": "wsus.localizer",
-        "title": "Wsus: Localizer"
+        "title": "Wsus: Laravel Localizer"
       }
-    ]
+    ] 
   },
   "scripts": {
     "lint": "eslint .",
