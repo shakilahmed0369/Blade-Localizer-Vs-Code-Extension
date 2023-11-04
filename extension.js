@@ -13,7 +13,7 @@ function extractTextFromCode(codeContent) {
       .map(function () {
         if (this.type === "text") {
           const text = $(this).text().trim();
-          if (text && !/[@{}$,()]/.test(text)) {
+          if (text && !/[@{}$,()*]/.test(text)) {
             // Replace the text directly
             $(this).replaceWith(`{{__("${text}")}}`);
           }

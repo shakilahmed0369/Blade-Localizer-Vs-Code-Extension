@@ -18,7 +18,7 @@
         "command": "wsus.localizer",
         "title": "Wsus: Laravel Localizer"
       }
-    ] 
+    ]
   },
   "scripts": {
     "lint": "eslint .",
@@ -39,5 +39,9 @@
     "cheerio": "^1.0.0-rc.12",
     "xmldom": "^0.6.0",
     "xpath": "^0.0.33"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shakilahmed0369/Wsus-Localizer-Vs-Code-Extension.git"
   }
 }
