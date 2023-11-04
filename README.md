@@ -2,6 +2,10 @@
 
 This extension will help you to auto select all your blade static strings and wrap those into localization syntax.
 
+## Screenshot
+![Uploading demo.gif…]()
+
+
 ## Features
 
 * Wrap static strings with Laravel localization syntax on click.
