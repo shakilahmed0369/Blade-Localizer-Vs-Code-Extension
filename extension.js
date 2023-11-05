@@ -3,17 +3,19 @@
 const vscode = require("vscode");
 const cheerio = require("cheerio");
 
-function extractTextFromCode(codeContent) {
+function extractTextFromCode(codeContent, ignoreSymbols) {
   const content = codeContent;
   let $ = cheerio.load(content);
-
   $("*").each((index, element) => {
     const text = $(element)
       .contents()
       .map(function () {
         if (this.type === "text") {
           const text = $(this).text().trim();
-          if (text && !/[@{}$,()*]/.test(text)) {
+          if (
+            text &&
+            !new RegExp(`[${ignoreSymbols}]`, "g").test(text)
+          ) {
             // Replace the text directly
             $(this).replaceWith(`{{__("${text}")}}`);
           }
@@ -66,7 +68,11 @@ function activate(context) {
         const document = editor.document;
         const content = document.getText();
 
-        const replacedContents = extractTextFromCode(content);
+        const configuration = vscode.workspace.getConfiguration(
+          "wsus_laravel_localizer"
+        );
+        const ignoreSymbols = configuration.get("ignore_symbols");
+        const replacedContents = extractTextFromCode(content, ignoreSymbols);
 
         // Replace content
         const edit = new vscode.WorkspaceEdit();
