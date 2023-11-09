@@ -30,6 +30,11 @@
             "type": "string",
             "default": "@{}$,()*",
             "description": "Symbols to ignore"
+          },
+          "wsus_laravel_localizer.fileExtensions": {
+            "type": "array",
+            "default": ["blade", "html"],
+            "description": "File extensions to process with the localizer"
           }
         }
       }
