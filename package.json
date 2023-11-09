@@ -21,6 +21,23 @@
         "command": "wsus.localizer",
         "title": "Wsus: Laravel Localizer"
       }
+    ],
+    "configuration": [
+      {
+        "title": "WSUS Laravel Localizer Configuration",
+        "properties": {
+          "wsus_laravel_localizer.ignore_symbols": {
+            "type": "string",
+            "default": "@{}$,()*",
+            "description": "Symbols to ignore"
+          },
+          "wsus_laravel_localizer.fileExtensions": {
+            "type": "array",
+            "default": ["blade", "html"],
+            "description": "File extensions to process with the localizer"
+          }
+        }
+      }
     ]
   },
   "scripts": {

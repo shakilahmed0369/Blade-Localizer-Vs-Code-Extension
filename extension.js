@@ -3,17 +3,19 @@
 const vscode = require("vscode");
 const cheerio = require("cheerio");
 
-function extractTextFromCode(codeContent) {
+function extractTextFromCode(codeContent, ignoreSymbols) {
   const content = codeContent;
   let $ = cheerio.load(content);
-
   $("*").each((index, element) => {
     const text = $(element)
       .contents()
       .map(function () {
         if (this.type === "text") {
           const text = $(this).text().trim();
-          if (text && !/[@{}$,()*]/.test(text)) {
+          if (
+            text &&
+            !new RegExp(`[${ignoreSymbols}]`, "g").test(text)
+          ) {
             // Replace the text directly
             $(this).replaceWith(`{{__("${text}")}}`);
           }
@@ -56,7 +58,6 @@ function activate(context) {
   let disposable = vscode.commands.registerCommand(
     "wsus.localizer",
     function () {
-      // The code you place here will be executed every time your command is executed
 
       // Get the active text editor
       const editor = vscode.window.activeTextEditor;
@@ -66,7 +67,20 @@ function activate(context) {
         const document = editor.document;
         const content = document.getText();
 
-        const replacedContents = extractTextFromCode(content);
+        const configuration = vscode.workspace.getConfiguration("wsus_laravel_localizer");
+        const ignoreSymbols = configuration.get("ignore_symbols");
+        const fileExtensions = configuration.get("fileExtensions", ["blade", "html"]);
+
+        const currentFilePath = document.uri.fsPath;
+        const [, currentFileExtension] = currentFilePath.split('.');
+        
+        // Validate file extesion
+        if (!fileExtensions.includes(currentFileExtension)) {
+          vscode.window.showInformationMessage(`Localizer is not configured for ${currentFileExtension} files.`);
+          return;
+        }
+
+        const replacedContents = extractTextFromCode(content, ignoreSymbols);
 
         // Replace content
         const edit = new vscode.WorkspaceEdit();
