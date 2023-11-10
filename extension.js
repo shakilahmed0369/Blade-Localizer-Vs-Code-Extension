@@ -7,19 +7,29 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
   const content = codeContent;
   let $ = cheerio.load(content);
   $("*").each((index, element) => {
+    
     const text = $(element)
       .contents()
       .map(function () {
+        console.log($(this).attr('placeholder'));
         if (this.type === "text") {
           const text = $(this).text().trim();
-          if (
-            text &&
-            !new RegExp(`[${ignoreSymbols}]`, "g").test(text)
-          ) {
+      
+          if ( text && !new RegExp(`[${ignoreSymbols}]`, "g").test(text) ) {
             // Replace the text directly
-            $(this).replaceWith(`{{__("${text}")}}`);
+            $(this).replaceWith(`{{__('${text}')}}`);
           }
         }
+
+        if($(this).attr('placeholder') !== undefined) {
+          const placeholder = $(this).attr('placeholder').trim();
+          
+          if ( placeholder && !new RegExp(`[${ignoreSymbols}]`, "g").test(placeholder) ) {
+            // Replace the placeholder text directly
+            $(this).attr('placeholder', `{{__('${placeholder}')}}`);
+          }
+        }
+
       });
   });
 
