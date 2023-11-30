@@ -70,37 +70,43 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
   var parsedHtml = ""; // Variable to store the parsed HTML
 
   // Parse HTML
-  const parser = new htmlparser.Parser({
-    onopentag(name, attribs) {
-      // Sort attributes alphabetically
-      const sortedAttributes = Object.entries(attribs);
-      // console.log(name, attribs);
-      // Append opening tag to parsedHtml
-      parsedHtml += `<${name} ${sortedAttributes
-        .map(([key, value]) => {
-          if (value === "") {
-            return key;
-          }
-          return `${key}="${value}"`;
-        })
-        .join(" ")}>`;
-    },
-    ontext(text) {
-      // Append text to parsedHtml
+  const parser = new htmlparser.Parser(
+    {
+      onopentag(name, attribs) {
+        // Sort attributes alphabetically
+        const sortedAttributes = Object.entries(attribs);
+        // console.log(name, attribs);
+        // Append opening tag to parsedHtml
+        parsedHtml += `<${name} ${sortedAttributes
+          .map(([key, value]) => {
+            if (value === "") {
+              return key;
+            }
+            return `${key}="${value}"`;
+          })
+          .join(" ")}>`;
+      },
+      ontext(text) {
+        // Append text to parsedHtml
 
-      if (/[{}@$]/.test(text) || /^\s*$/.test(text)) {
-        parsedHtml += text; // Add text as is
-      } else {
-        parsedHtml += `{{ __('${text.trim()}') }}`; // Wrap text with {{ __('text') }}
-      }
+        if (/[{}@$]/.test(text) || /^\s*$/.test(text)) {
+          parsedHtml += text; // Add text as is
+        } else {
+          parsedHtml += `{{ __('${text.trim()}') }}`; // Wrap text with {{ __('text') }}
+        }
+      },
+      onclosetag(name) {
+        if (!$voidTags.includes(name)) {
+          // Append closing tag to parsedHtml
+          parsedHtml += `</${name}>`;
+        }
+      },
     },
-    onclosetag(name) {
-      if (!$voidTags.includes(name)) {
-        // Append closing tag to parsedHtml
-        parsedHtml += `</${name}>`;
-      }
-    },
-  });
+    {
+      lowerCaseAttributeNames: false,
+      lowerCaseTags: false,
+    }
+  );
 
   parser.write(encodeSpecialCharacters(codeContent));
   parser.end();
