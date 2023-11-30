@@ -1,56 +1,113 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
-const cheerio = require("cheerio");
+const htmlparser = require("htmlparser2");
+
+  var $voidTags = [
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "keygen",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+  ];
+
+function encodeSpecialCharacters(content) {
+  // Replace '->' with '[arw]' before parsing
+  const modifiedData = content
+    .replace(/->/g, "{arw}")
+    .replace(/<!/g, "{lt}")
+    .replace(/===/g, "{3eq}")
+    .replace(/==/g, "{2eq}")
+    .replace(/=/g, "{eq}")
+    .replace(/(['"])(.*?)\1/g, function (match, quote, content) {
+      // Replace '/' with '{slash}' only within the captured content
+      var replacedContent = content.replace(/\//g, "{slash}");
+      return quote + replacedContent + quote;
+    })
+    .replace(/{{(.*?)}}/g, function (match, group) {
+      var replacedGroup = group.replace(/\s+/g, "~");
+      return "{{" + replacedGroup + "}}";
+    })
+    .replace(/__\((.*?)\)/g, function (match, group) {
+      var replacedGroup = group.replace(/\s+/g, "~");
+      return "__(" + replacedGroup + ")";
+    });
+
+  return modifiedData;
+}
+
+function decodeSpecialCharacters(content) {
+  const modifiedData = content 
+    .replace(/\{arw\}/g, "->")
+    .replace(/\{lt\}/g, "<!")
+    .replace(/\{3eq\}/g, "===")
+    .replace(/\{2eq\}/g, "==")
+    .replace(/\{eq\}/g, "=")
+    .replace(/\{slash\}/g, "/")
+    .replace(/{{(.*?)}}/g, function (match, group) {
+      var replacedGroup = group.replace(/\~/g, " ");
+      return "{{" + replacedGroup + "}}";
+    })
+    .replace(/__\((.*?)\)/g, function (match, group) {
+      var replacedGroup = group.replace(/\~/g, " ");
+      return "__(" + replacedGroup + ")";
+    });
+  
+  return modifiedData;
+}
 
 function extractTextFromCode(codeContent, ignoreSymbols) {
-  const content = codeContent;
-  let $ = cheerio.load(content);
-  $("*").each((index, element) => {
-    
-    const text = $(element)
-      .contents()
-      .map(function () {
-        console.log($(this).attr('placeholder'));
-        if (this.type === "text") {
-          const text = $(this).text().trim();
-      
-          if ( text && !new RegExp(`[${ignoreSymbols}]`, "g").test(text) ) {
-            // Replace the text directly
-            $(this).replaceWith(`{{__('${text}')}}`);
-          }
-        }
+  var parsedHtml = ""; // Variable to store the parsed HTML
 
-        if($(this).attr('placeholder') !== undefined) {
-          const placeholder = $(this).attr('placeholder').trim();
-          
-          if ( placeholder && !new RegExp(`[${ignoreSymbols}]`, "g").test(placeholder) ) {
-            // Replace the placeholder text directly
-            $(this).attr('placeholder', `{{__('${placeholder}')}}`);
+  // Parse HTML
+  const parser = new htmlparser.Parser({
+    onopentag(name, attribs) {
+      // Sort attributes alphabetically
+      const sortedAttributes = Object.entries(attribs);
+      // console.log(name, attribs);
+      // Append opening tag to parsedHtml
+      parsedHtml += `<${name} ${sortedAttributes
+        .map(([key, value]) => {
+          if (value === "") {
+            return key;
           }
-        }
+          return `${key}="${value}"`;
+        })
+        .join(" ")}>`;
+    },
+    ontext(text) {
+      // Append text to parsedHtml
 
-      });
+      if (/[{}@$]/.test(text) || /^\s*$/.test(text)) {
+        parsedHtml += text; // Add text as is
+      } else {
+        parsedHtml += `{{ __('${text.trim()}') }}`; // Wrap text with {{ __('text') }}
+      }
+    },
+    onclosetag(name) {
+      if (!$voidTags.includes(name)) {
+        // Append closing tag to parsedHtml
+        parsedHtml += `</${name}>`;
+      }
+    },
   });
 
-  // Return the modified content as a string
-  return trimmer($.html());
+  parser.write(encodeSpecialCharacters(codeContent));
+  parser.end();
+
+  return decodeSpecialCharacters(parsedHtml);
 }
 
-// Trim or replace unneeded contents
-function trimmer(content) {
-  var trimmedContent = content;
-
-  if (content.indexOf("<!DOCTYPE html>") === -1) {
-    const startIndex = content.indexOf("<body>") + 6;
-    const endIndex = content.indexOf("</body>");
-    var trimmedContent = trimmedContent.substring(startIndex, endIndex);
-  }
-  var trimmedContent = trimmedContent.replace(/-=""/g, "-");
-  var trimmedContent = trimmedContent.replace(/&gt;/g, ">");
-
-  return trimmedContent;
-}
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
