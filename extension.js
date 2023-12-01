@@ -43,6 +43,11 @@ function encodeSpecialCharacters(content) {
     .replace(/__\((.*?)\)/g, function (match, group) {
       var replacedGroup = group.replace(/\s+/g, "~");
       return "__(" + replacedGroup + ")";
+    })
+    .replace(/\((.*?)\)/g, function (match, group) {
+      var replacedGroup = group.replace(/>/g, "&gt;");
+      replacedGroup = replacedGroup.replace(/</g, "&lt;");
+      return "(" + replacedGroup + ")";
     });
 
   return modifiedData;
@@ -66,8 +71,13 @@ function decodeSpecialCharacters(content) {
     .replace(/__\((.*?)\)/g, function (match, group) {
       var replacedGroup = group.replace(/\~/g, " ");
       return "__(" + replacedGroup + ")";
+    })
+    .replace(/\((.*?)\)/g, function (match, group) {
+      var replacedGroup = group.replace(/&gt;/g, ">");
+      replacedGroup = replacedGroup.replace(/&lt;/g, "<");
+      return "(" + replacedGroup + ")";
     });
-  
+
   return modifiedData;
 }
 
