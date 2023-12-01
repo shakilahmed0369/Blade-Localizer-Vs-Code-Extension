@@ -36,6 +36,8 @@ function encodeSpecialCharacters(content) {
     })
     .replace(/{{(.*?)}}/g, function (match, group) {
       var replacedGroup = group.replace(/\s+/g, "~");
+      replacedGroup = replacedGroup.replace(/>/g, "&gt;");
+      replacedGroup = replacedGroup.replace(/</g, "&lt;");
       return "{{" + replacedGroup + "}}";
     })
     .replace(/__\((.*?)\)/g, function (match, group) {
@@ -56,6 +58,9 @@ function decodeSpecialCharacters(content) {
     .replace(/\{slash\}/g, "/")
     .replace(/{{(.*?)}}/g, function (match, group) {
       var replacedGroup = group.replace(/\~/g, " ");
+      replacedGroup = replacedGroup.replace(/&gt;/g, ">");
+      replacedGroup = replacedGroup.replace(/&lt;/g, "<");
+
       return "{{" + replacedGroup + "}}";
     })
     .replace(/__\((.*?)\)/g, function (match, group) {
@@ -112,6 +117,7 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
   parser.end();
 
   return decodeSpecialCharacters(parsedHtml);
+  // return parsedHtml;
 }
 
 
