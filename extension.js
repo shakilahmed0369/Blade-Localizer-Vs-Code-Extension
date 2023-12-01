@@ -104,7 +104,7 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
       ontext(text) {
         // Append text to parsedHtml
 
-        if (/[{}@$]/.test(text) || /^\s*$/.test(text)) {
+        if (new RegExp(`[${ignoreSymbols}]`).test(text) || /^\s*$/.test(text)) {
           parsedHtml += text; // Add text as is
         } else {
           parsedHtml += `{{ __('${text.trim()}') }}`; // Wrap text with {{ __('text') }}
