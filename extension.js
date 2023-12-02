@@ -2,24 +2,25 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
 const htmlparser = require("htmlparser2");
+var selfClosingTag = [];
 
-  var $voidTags = [
-    "area",
-    "base",
-    "br",
-    "col",
-    "embed",
-    "hr",
-    "img",
-    "input",
-    "keygen",
-    "link",
-    "meta",
-    "param",
-    "source",
-    "track",
-    "wbr",
-  ];
+var $voidTags = [
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "keygen",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+];
 
 function encodeSpecialCharacters(content) {
   // Replace '->' with '[arw]' before parsing
@@ -48,13 +49,16 @@ function encodeSpecialCharacters(content) {
       var replacedGroup = group.replace(/>/g, "&gt;");
       replacedGroup = replacedGroup.replace(/</g, "&lt;");
       return "(" + replacedGroup + ")";
+    })
+    .replace(/<(\w+)([^>]*)\/>/g, function (match, name, attributes) {
+      return `<${name}${attributes} selfClosingTag />`;
     });
 
   return modifiedData;
 }
 
 function decodeSpecialCharacters(content) {
-  const modifiedData = content 
+  const modifiedData = content
     .replace(/\{arw\}/g, "->")
     .replace(/\{lt\}/g, "<!")
     .replace(/\{3eq\}/g, "===")
@@ -81,6 +85,35 @@ function decodeSpecialCharacters(content) {
   return modifiedData;
 }
 
+function createStartingTag(name, attribs) {
+  const sortedAttributes = Object.entries(attribs);
+
+  if (attribs.hasOwnProperty("selfClosingTag")) {
+    selfClosingTag.push(name);
+  }
+
+  return `<${name} ${sortedAttributes
+    .map(([key, value]) => {
+      if (value === "") {
+        if (key === "selfClosingTag") {
+          return;
+        }
+        return key;
+      }
+      return `${key}="${value}"`;
+    })
+    .join(" ")}${selfClosingTag.includes(name) ? "/>" : ">"}`;
+}
+
+function createEndingTag(name) {
+  if (!$voidTags.includes(name) && !selfClosingTag.includes(name)) {
+    // Append closing tag to parsedHtml
+    return `</${name}>`;
+  }
+
+  return "";
+}
+
 function extractTextFromCode(codeContent, ignoreSymbols) {
   var parsedHtml = ""; // Variable to store the parsed HTML
 
@@ -88,22 +121,10 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
   const parser = new htmlparser.Parser(
     {
       onopentag(name, attribs) {
-        // Sort attributes alphabetically
-        const sortedAttributes = Object.entries(attribs);
-        // console.log(name, attribs);
-        // Append opening tag to parsedHtml
-        parsedHtml += `<${name} ${sortedAttributes
-          .map(([key, value]) => {
-            if (value === "") {
-              return key;
-            }
-            return `${key}="${value}"`;
-          })
-          .join(" ")}>`;
+        parsedHtml += createStartingTag(name, attribs);
       },
       ontext(text) {
         // Append text to parsedHtml
-
         if (new RegExp(`[${ignoreSymbols}]`).test(text) || /^\s*$/.test(text)) {
           parsedHtml += text; // Add text as is
         } else {
@@ -111,10 +132,8 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
         }
       },
       onclosetag(name) {
-        if (!$voidTags.includes(name)) {
-          // Append closing tag to parsedHtml
-          parsedHtml += `</${name}>`;
-        }
+        // Append closing tag to parsedHtml
+        parsedHtml += createEndingTag(name);
       },
     },
     {
@@ -130,24 +149,17 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
   // return parsedHtml;
 }
 
-
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "localizer" is now active!');
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with  registerCommand
-  // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand(
     "wsus.localizer",
     function () {
-
       // Get the active text editor
       const editor = vscode.window.activeTextEditor;
 
@@ -156,16 +168,23 @@ function activate(context) {
         const document = editor.document;
         const content = document.getText();
 
-        const configuration = vscode.workspace.getConfiguration("wsus_laravel_localizer");
+        const configuration = vscode.workspace.getConfiguration(
+          "wsus_laravel_localizer"
+        );
         const ignoreSymbols = configuration.get("ignore_symbols");
-        const fileExtensions = configuration.get("fileExtensions", ["blade", "html"]);
+        const fileExtensions = configuration.get("fileExtensions", [
+          "blade",
+          "html",
+        ]);
 
         const currentFilePath = document.uri.fsPath;
-        const [, currentFileExtension] = currentFilePath.split('.');
-        
+        const [, currentFileExtension] = currentFilePath.split(".");
+
         // Validate file extesion
         if (!fileExtensions.includes(currentFileExtension)) {
-          vscode.window.showInformationMessage(`Localizer is not configured for ${currentFileExtension} files.`);
+          vscode.window.showInformationMessage(
+            `Localizer is not configured for ${currentFileExtension} files.`
+          );
           return;
         }
 
