@@ -28,7 +28,7 @@
         "properties": {
           "wsus_laravel_localizer.ignore_symbols": {
             "type": "string",
-            "default": "@{}$,()*",
+            "default": "@{}$,()*><",
             "description": "Symbols to ignore"
           },
           "wsus_laravel_localizer.fileExtensions": {
