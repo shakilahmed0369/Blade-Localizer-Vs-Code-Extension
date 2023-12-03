@@ -26,14 +26,11 @@ var $voidTags = [
 function encodeSpecialCharacters(content) {
   // Replace '->' with '[arw]' before parsing
   const modifiedData = content
-    .replace(/{{--([\s\S]*?)--}}/g, function (match, group) {
-      let randNum = Math.floor(Math.random() * 100) + 1;
-      console.log(randNum);
-      bladeComments[randNum] = match;
-      return `{comment${randNum}}`;
+    .replace(/{{--([\s\S]*?)--}}|<!--([\s\S]*?)-->/g, function (match, group) {
+      let index = bladeComments.push(match) - 1;
+      return `{comment${index}}`;
     })
     .replace(/->/g, "{arw}")
-    .replace(/<!/g, "{lt}")
     .replace(/===/g, "{3eq}")
     .replace(/==/g, "{2eq}")
     .replace(/=/g, "{eq}")
@@ -67,7 +64,6 @@ function encodeSpecialCharacters(content) {
 function decodeSpecialCharacters(content) {
   var modifiedData = content
     .replace(/\{arw\}/g, "->")
-    .replace(/\{lt\}/g, "<!")
     .replace(/\{3eq\}/g, "===")
     .replace(/\{2eq\}/g, "==")
     .replace(/\{eq\}/g, "=")
