@@ -3,6 +3,7 @@
 const vscode = require("vscode");
 const htmlparser = require("htmlparser2");
 var selfClosingTag = [];
+var bladeComments = [];
 
 var $voidTags = [
   "area",
@@ -25,6 +26,12 @@ var $voidTags = [
 function encodeSpecialCharacters(content) {
   // Replace '->' with '[arw]' before parsing
   const modifiedData = content
+    .replace(/{{--([\s\S]*?)--}}/g, function (match, group) {
+      let randNum = Math.floor(Math.random() * 100) + 1;
+      console.log(randNum);
+      bladeComments[randNum] = match;
+      return `{comment${randNum}}`;
+    })
     .replace(/->/g, "{arw}")
     .replace(/<!/g, "{lt}")
     .replace(/===/g, "{3eq}")
@@ -58,7 +65,7 @@ function encodeSpecialCharacters(content) {
 }
 
 function decodeSpecialCharacters(content) {
-  const modifiedData = content
+  var modifiedData = content
     .replace(/\{arw\}/g, "->")
     .replace(/\{lt\}/g, "<!")
     .replace(/\{3eq\}/g, "===")
@@ -72,6 +79,7 @@ function decodeSpecialCharacters(content) {
 
       return "{{" + replacedGroup + "}}";
     })
+
     .replace(/__\((.*?)\)/g, function (match, group) {
       var replacedGroup = group.replace(/\~/g, " ");
       return "__(" + replacedGroup + ")";
@@ -81,6 +89,13 @@ function decodeSpecialCharacters(content) {
       replacedGroup = replacedGroup.replace(/&lt;/g, "<");
       return "(" + replacedGroup + ")";
     });
+
+  for (const comment in bladeComments) {
+    modifiedData = modifiedData.replace(
+      `{comment${comment}}`,
+      bladeComments[comment]
+    );
+  }
 
   return modifiedData;
 }
@@ -121,6 +136,7 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
   const parser = new htmlparser.Parser(
     {
       onopentag(name, attribs) {
+        console.log(name, attribs);
         parsedHtml += createStartingTag(name, attribs);
       },
       ontext(text) {
@@ -146,7 +162,6 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
   parser.end();
 
   return decodeSpecialCharacters(parsedHtml);
-  // return parsedHtml;
 }
 
 // This method is called when your extension is activated
