@@ -34,12 +34,13 @@ function encodeSpecialCharacters(content) {
     .replace(/===/g, "{3eq}")
     .replace(/==/g, "{2eq}")
     .replace(/=/g, "{eq}")
+    .replace(/=>/g, "{eqgt}")
     .replace(/(['"])(.*?)\1/g, function (match, quote, content) {
       // Replace '/' with '{slash}' only within the captured content
       var replacedContent = content.replace(/\//g, "{slash}");
       return quote + replacedContent + quote;
     })
-    .replace(/{{(.*?)}}/g, function (match, group) {
+    .replace(/{{([\s\S]*?)}}/g, function (match, group) {
       var replacedGroup = group.replace(/\s+/g, "~");
       replacedGroup = replacedGroup.replace(/>/g, "&gt;");
       replacedGroup = replacedGroup.replace(/</g, "&lt;");
@@ -67,8 +68,9 @@ function decodeSpecialCharacters(content) {
     .replace(/\{3eq\}/g, "===")
     .replace(/\{2eq\}/g, "==")
     .replace(/\{eq\}/g, "=")
+    .replace(/\{eqgt\}/g, "=>")
     .replace(/\{slash\}/g, "/")
-    .replace(/{{(.*?)}}/g, function (match, group) {
+    .replace(/{{([\s\S]*?)}}/g, function (match, group) {
       var replacedGroup = group.replace(/\~/g, " ");
       replacedGroup = replacedGroup.replace(/&gt;/g, ">");
       replacedGroup = replacedGroup.replace(/&lt;/g, "<");
@@ -97,6 +99,8 @@ function decodeSpecialCharacters(content) {
 }
 
 function createStartingTag(name, attribs) {
+  console.log(name, attribs);
+  var selfClosingTag = [];
   const sortedAttributes = Object.entries(attribs);
 
   if (attribs.hasOwnProperty("selfClosingTag")) {
@@ -136,6 +140,7 @@ function extractTextFromCode(codeContent, ignoreSymbols) {
         parsedHtml += createStartingTag(name, attribs);
       },
       ontext(text) {
+        console.log(text)
         // Append text to parsedHtml
         if (new RegExp(`[${ignoreSymbols}]`).test(text) || /^\s*$/.test(text)) {
           parsedHtml += text; // Add text as is
