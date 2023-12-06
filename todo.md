@@ -1,0 +1,4 @@
+-[x] have to add support for html comments
+-[] have to organize code base code replacement function is messy
+-[x] have add support for {{  }} those that have line break
+-[x] have to check <x-admin.save-button/> this type components
