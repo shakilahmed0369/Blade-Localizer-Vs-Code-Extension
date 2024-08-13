@@ -1,175 +1,62 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+
 const vscode = require("vscode");
-const htmlparser = require("htmlparser2");
-var selfClosingTag = [];
-var bladeComments = [];
 
-var $voidTags = [
-  "area",
-  "base",
-  "br",
-  "col",
-  "embed",
-  "hr",
-  "img",
-  "input",
-  "keygen",
-  "link",
-  "meta",
-  "param",
-  "source",
-  "track",
-  "wbr",
-];
 
-function encodeSpecialCharacters(content) {
-  // Replace '->' with '[arw]' before parsing
-  const modifiedData = content
-    .replace(/{{--([\s\S]*?)--}}|<!--([\s\S]*?)-->/g, function (match, group) {
-      let index = bladeComments.push(match) - 1;
-      return `{comment${index}}`;
-    })
-    .replace(/->/g, "{arw}")
-    .replace(/===/g, "{3eq}")
-    .replace(/==/g, "{2eq}")
-    .replace(/=/g, "{eq}")
-    .replace(/=>/g, "{eqgt}")
-    .replace(/(['"])(.*?)\1/g, function (match, quote, content) {
-      // Replace '/' with '{slash}' only within the captured content
-      var replacedContent = content.replace(/\//g, "{slash}");
-      return quote + replacedContent + quote;
-    })
-    .replace(/{{([\s\S]*?)}}/g, function (match, group) {
-      var replacedGroup = group.replace(/\s+/g, "~");
-      replacedGroup = replacedGroup.replace(/>/g, "&gt;");
-      replacedGroup = replacedGroup.replace(/</g, "&lt;");
-      return "{{" + replacedGroup + "}}";
-    })
-    .replace(/__\((.*?)\)/g, function (match, group) {
-      var replacedGroup = group.replace(/\s+/g, "~");
-      return "__(" + replacedGroup + ")";
-    })
-    .replace(/\((.*?)\)/g, function (match, group) {
-      var replacedGroup = group.replace(/>/g, "&gt;");
-      replacedGroup = replacedGroup.replace(/</g, "&lt;");
-      return "(" + replacedGroup + ")";
-    })
-    .replace(/<(\w+)([^>]*)\/>/g, function (match, name, attributes) {
-      return `<${name}${attributes} selfClosingTag />`;
-    });
+function wrapTextNodesWithBladeDirective(bladeSource) {
+  if (!bladeSource) return '';
 
-  return modifiedData;
-}
+  // Helper function to wrap text nodes
+  function wrapText(text) {
+    // Trim the text and replace special characters
+    let trim_data = text.trim()
+    .replace(/[',.]/g, '');
 
-function decodeSpecialCharacters(content) {
-  var modifiedData = content
-    .replace(/\{arw\}/g, "->")
-    .replace(/\{3eq\}/g, "===")
-    .replace(/\{2eq\}/g, "==")
-    .replace(/\{eq\}/g, "=")
-    .replace(/\{eqgt\}/g, "=>")
-    .replace(/\{slash\}/g, "/")
-    .replace(/{{([\s\S]*?)}}/g, function (match, group) {
-      var replacedGroup = group.replace(/\~/g, " ");
-      replacedGroup = replacedGroup.replace(/&gt;/g, ">");
-      replacedGroup = replacedGroup.replace(/&lt;/g, "<");
-
-      return "{{" + replacedGroup + "}}";
-    })
-
-    .replace(/__\((.*?)\)/g, function (match, group) {
-      var replacedGroup = group.replace(/\~/g, " ");
-      return "__(" + replacedGroup + ")";
-    })
-    .replace(/\((.*?)\)/g, function (match, group) {
-      var replacedGroup = group.replace(/&gt;/g, ">");
-      replacedGroup = replacedGroup.replace(/&lt;/g, "<");
-      return "(" + replacedGroup + ")";
-    });
-
-  for (const comment in bladeComments) {
-    modifiedData = modifiedData.replace(
-      `{comment${comment}}`,
-      bladeComments[comment]
-    );
+    return `{{ __('${trim_data}') }}`;
   }
 
-  return modifiedData;
-}
+  // Match Blade directives
+  const bladeDirectiveRegex = /@\w+(?:\([^)]*\))?/g;
 
-function createStartingTag(name, attribs) {
-  console.log(name, attribs);
-  var selfClosingTag = [];
-  const sortedAttributes = Object.entries(attribs);
+  // Split the template by Blade directives to process text nodes separately
+  const parts = bladeSource.split(bladeDirectiveRegex);
 
-  if (attribs.hasOwnProperty("selfClosingTag")) {
-    selfClosingTag.push(name);
+  // Find all Blade directives to maintain the original order
+  const directives = [...bladeSource.matchAll(bladeDirectiveRegex)].map(match => match[0]);
+
+  // Helper function to check if we are inside <script>, <style>, @push or @endpush
+  function isInsideNoWrapSection(part) {
+    const scriptStyleRegex = /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|@push[\s\S]*?@endpush/g;
+    return scriptStyleRegex.test(part);
   }
 
-  return `<${name} ${sortedAttributes
-    .map(([key, value]) => {
-      if (value === "") {
-        if (key === "selfClosingTag") {
-          return;
-        }
-        return key;
-      }
-      return `${key}="${value}"`;
-    })
-    .join(" ")}${selfClosingTag.includes(name) ? "/>" : ">"}`;
-}
+  let result = '';
 
-function createEndingTag(name) {
-  if (!$voidTags.includes(name) && !selfClosingTag.includes(name)) {
-    // Append closing tag to parsedHtml
-    return `</${name}>`;
-  }
-
-  return "";
-}
-
-function extractTextFromCode(codeContent, ignoreSymbols) {
-  var parsedHtml = ""; // Variable to store the parsed HTML
-
-  // Parse HTML
-  const parser = new htmlparser.Parser(
-    {
-      onopentag(name, attribs) {
-        console.log(name, attribs);
-        parsedHtml += createStartingTag(name, attribs);
-      },
-      ontext(text) {
-        console.log(text)
-        // Append text to parsedHtml
-        if (new RegExp(`[${ignoreSymbols}]`).test(text) || /^\s*$/.test(text)) {
-          parsedHtml += text; // Add text as is
+  // Process each part
+  parts.forEach((part, index) => {
+    if (isInsideNoWrapSection(part)) {
+      result += part;
+    } else {
+      // Wrap each text node within the part
+      const wrappedPart = part.replace(/(>)([^<]+)(<)/g, (match, p1, p2, p3) => {
+        if (p2.trim() !== '' && !p2.includes('{') && !p2.includes('}')) {
+          return p1 + wrapText(p2) + p3;
         } else {
-          parsedHtml += `{{ __('${text.trim()}') }}`; // Wrap text with {{ __('text') }}
+          return p1 + p2 + p3;
         }
-      },
-      onclosetag(name) {
-        // Append closing tag to parsedHtml
-        parsedHtml += createEndingTag(name);
-      },
-    },
-    {
-      lowerCaseAttributeNames: false,
-      lowerCaseTags: false,
+      });
+
+      result += wrappedPart;
     }
-  );
 
-  parser.write(encodeSpecialCharacters(codeContent));
-  parser.end();
+    // Add the corresponding Blade directive back
+    if (index < directives.length) {
+      result += directives[index];
+    }
+  });
 
-  return decodeSpecialCharacters(parsedHtml);
+  return result;
 }
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-/**
- * @param {vscode.ExtensionContext} context
- */
 function activate(context) {
   console.log('Congratulations, your extension "localizer" is now active!');
 
@@ -184,27 +71,7 @@ function activate(context) {
         const document = editor.document;
         const content = document.getText();
 
-        const configuration = vscode.workspace.getConfiguration(
-          "wsus_laravel_localizer"
-        );
-        const ignoreSymbols = configuration.get("ignore_symbols");
-        const fileExtensions = configuration.get("fileExtensions", [
-          "blade",
-          "html",
-        ]);
-
-        const currentFilePath = document.uri.fsPath;
-        const [, currentFileExtension] = currentFilePath.split(".");
-
-        // Validate file extesion
-        if (!fileExtensions.includes(currentFileExtension)) {
-          vscode.window.showInformationMessage(
-            `Localizer is not configured for ${currentFileExtension} files.`
-          );
-          return;
-        }
-
-        const replacedContents = extractTextFromCode(content, ignoreSymbols);
+        const replacedContents = wrapTextNodesWithBladeDirective(content);
 
         // Replace content
         const edit = new vscode.WorkspaceEdit();
@@ -232,7 +99,7 @@ function activate(context) {
 }
 
 // This method is called when your extension is deactivated
-function deactivate() {}
+function deactivate() { }
 
 module.exports = {
   activate,
