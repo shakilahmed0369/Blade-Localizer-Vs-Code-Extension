@@ -8,7 +8,7 @@ This extension will help you to auto select all your blade static strings and wr
 
 ## Screenshot
 
-![demo](https://github.com/shakilahmed0369/Wsus-Localizer-Vs-Code-Extension/assets/51516043/da98842a-d832-447a-9513-968c4589b89e)
+![demo](https://raw.githubusercontent.com/shakilahmed0369/public-cdn-files/main/uploads/Screencastfrom2024-08-1401-50-58-ezgif.com-video-to-gif-converter.gif)
 
 ## Features
 
