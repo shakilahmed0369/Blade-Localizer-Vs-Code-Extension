@@ -1,4 +1,4 @@
-![banner](https://github.com/shakilahmed0369/Wsus-Localizer-Vs-Code-Extension/assets/51516043/5fc88d9f-79c4-4987-be27-0b11838ec417)
+![banner](https://github.com/user-attachments/assets/d0cc825f-f2aa-419e-bfab-0d72f031d9a1)
 
 # Laravel Blade Localization Wrapper Extension
 
