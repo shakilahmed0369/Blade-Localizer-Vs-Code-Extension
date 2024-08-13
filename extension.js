@@ -61,7 +61,7 @@ function activate(context) {
   console.log('Congratulations, your extension "localizer" is now active!');
 
   let disposable = vscode.commands.registerCommand(
-    "wsus.localizer",
+    "laravel.blade.localizer",
     function () {
       // Get the active text editor
       const editor = vscode.window.activeTextEditor;

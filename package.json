@@ -12,35 +12,18 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:wsus.localizer"
+    "onCommand:laravel.blade.localizer"
   ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "wsus.localizer",
-        "title": "Wsus: Laravel Localizer"
+        "command": "laravel.blade.localizer",
+        "title": "Laravel: Localize blade static texts"
       }
     ],
     "configuration": [
-      {
-        "title": "WSUS Laravel Localizer Configuration",
-        "properties": {
-          "wsus_laravel_localizer.ignore_symbols": {
-            "type": "string",
-            "default": "@{}$,()*><",
-            "description": "Symbols to ignore"
-          },
-          "wsus_laravel_localizer.fileExtensions": {
-            "type": "array",
-            "default": [
-              "blade",
-              "html"
-            ],
-            "description": "File extensions to process with the localizer"
-          }
-        }
-      }
+      
     ]
   },
   "scripts": {
@@ -59,7 +42,6 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "htmlparser2": "^9.0.0"
   },
   "repository": {
     "type": "git",
