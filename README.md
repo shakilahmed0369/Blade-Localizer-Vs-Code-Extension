@@ -1,5 +1,6 @@
-![banner](https://github.com/user-attachments/assets/d0cc825f-f2aa-419e-bfab-0d72f031d9a1)
-
+<p align="center">
+![logo](https://github.com/user-attachments/assets/91906d9e-1903-4adb-a597-7f2aed5e9e0b)
+</p>
 # Laravel Blade Localization Wrapper Extension
 
 This extension will help you to auto select all your blade static strings and wrap those into localization syntax.
