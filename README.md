@@ -4,11 +4,13 @@
 
 # Laravel Blade Localization Wrapper Extension
 
-This extension will help you to auto select all your blade static strings and wrap those into localization syntax.
+This extension will help you to auto-select all your blade static strings and wrap those into localization syntax.
 
 ## Screenshot
 
-![demo](https://raw.githubusercontent.com/shakilahmed0369/public-cdn-files/main/uploads/Screencastfrom2024-08-1401-50-58-ezgif.com-video-to-gif-converter.gif)
+<div align="center" width="200">
+  <img src="https://raw.githubusercontent.com/shakilahmed0369/public-cdn-files/main/uploads/Screencastfrom2024-08-1401-50-58-ezgif.com-video-to-gif-converter.gif" alt="banner">
+</div>
 
 ## Features
 
