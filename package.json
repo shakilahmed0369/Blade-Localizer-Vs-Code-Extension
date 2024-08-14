@@ -9,7 +9,10 @@
     "vscode": "^1.84.0"
   },
   "categories": [
-    "Other"
+    "Other", "Programming Languages", "Formatters"
+  ],
+  "keywords": [
+    "Laravel", "Blade", "Localization", "Laravel localization", "Blade localization"
   ],
   "activationEvents": [
     "onCommand:laravel.blade.localizer"
@@ -45,6 +48,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shakilahmed0369/Wsus-Localizer-Vs-Code-Extension.git"
+    "url": "https://github.com/shakilahmed0369/Blade-Localizer-Vs-Code-Extension"
   }
 }
