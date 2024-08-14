@@ -14,7 +14,7 @@ This extension will help you to auto-select all your blade static strings and wr
 
 ## Features
 
-* Wrap static strings with Laravel localization syntax on click.
+* Wrap static strings with Laravel localization syntax one click.
 * Auto detect static strings from file.
 * Auto ignore strings that have special characters.
 * Blazing Fast.
@@ -37,14 +37,8 @@ This extension will help you to auto-select all your blade static strings and wr
 ```blade
 <h1>Hello world!</h1>
 
-<h1>{{__('Hello world!')}}</h1>
+<h1>{{ __('Hello world!') }}</h1>
 ```
-
-## Known Issues
-
-Some time some string can be skipped from auto detection depending on your
-code structure. 
-As this is a beta release of this extension so there could be some bug. Make sure you always give a basic check your code after running the extension.
 
 ## Feedback
 If you have any feedback or suggestions, please feel free to create an issue on the repository.
