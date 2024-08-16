@@ -30,7 +30,7 @@ This extension will help you to auto-select all your blade static strings and wr
 
 1. Open a Laravel Blade file in Visual Studio Code.
 4. Press `Ctrl`+`Shift`+`P` to open the Command Palette.
-5. Type "Wsus: Laravel Localizer" and select the command and execute.
+5. Type "Laravel Blade Localizer" and select the command and execute.
 
 ## Example
 
