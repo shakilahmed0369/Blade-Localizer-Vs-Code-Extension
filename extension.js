@@ -2,16 +2,47 @@
 const vscode = require("vscode");
 
 
+function replaceCommonSigns(content) {
+  content = content.replace(/{{(.*?)}}/g, function (match, p1) {
+    // Replace < and > only within the matched content inside {{ }}
+    let safeContent = p1.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `{{${safeContent}}}`;
+  });
+
+  return content;
+
+}
+
+function undoReplaceCommonSigns(content) {
+  content = content.replace(/{{(.*?)}}/g, function (match, p1) {
+    // Replace < and > only within the matched content inside {{ }}
+    let safeContent = p1.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+    return `{{${safeContent}}}`;
+  });
+
+  return content;
+}
+
+
+
+
 function wrapTextNodesWithBladeDirective(bladeSource) {
   if (!bladeSource) return '';
 
   // Helper function to wrap text nodes
-  function wrapText(text) {
-    // Trim the text and replace special characters
-    let trim_data = text.trim()
-    .replace(/[',.]/g, '');
+  // function wrapText(text) {
+  //   // Trim the text and replace special characters
+  //   let trim_data = text.trim()
+  //     .replace(/[',.]/g, '');
 
-    return `{{ __('${trim_data}') }}`;
+  //   return `{{ __('${trim_data}') }}`;
+  // }
+
+  function wrapText(content) {
+    return content.replace(/(\s*)([^{}]+?)(\s*)(?={{|$)/g, function (match, leadingSpace, staticText, trailingSpace) {
+      // Only wrap the static text and leave the spaces as they are
+      return `${leadingSpace}{{ __('${staticText}') }}${trailingSpace}`;
+    });
   }
 
   // Match Blade directives
@@ -69,20 +100,23 @@ function activate(context) {
       if (editor) {
         // Get the document and its content
         const document = editor.document;
-        const content = document.getText();
+        var content = document.getText();
+
+        content = replaceCommonSigns(content);
 
         const replacedContents = wrapTextNodesWithBladeDirective(content);
+        console.log(content);
 
         // Replace content
         const edit = new vscode.WorkspaceEdit();
-        edit.replace(
-          document.uri,
-          new vscode.Range(
-            document.positionAt(0), // Start of the content
-            document.positionAt(content.length) // End of the content
-          ),
-          replacedContents
-        );
+        // edit.replace(
+        //   document.uri,
+        //   new vscode.Range(
+        //     document.positionAt(0), // Start of the content
+        //     document.positionAt(content.length) // End of the content
+        //   ),
+        //   replacedContents
+        // );
 
         vscode.workspace.applyEdit(edit).then(() => {
           vscode.window.showInformationMessage(
