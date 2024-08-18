@@ -41,6 +41,7 @@ function wrapTextNodesWithBladeDirective(bladeSource) {
   function wrapText(content) {
     return content.replace(/(\s*)([^{}]+?)(\s*)(?={{|$)/g, function (match, leadingSpace, staticText, trailingSpace) {
       // Only wrap the static text and leave the spaces as they are
+      staticText = staticText.trim().replace(/[',.]/g, '');
       return `${leadingSpace}{{ __('${staticText}') }}${trailingSpace}`;
     });
   }
@@ -69,7 +70,7 @@ function wrapTextNodesWithBladeDirective(bladeSource) {
     } else {
       // Wrap each text node within the part
       const wrappedPart = part.replace(/(>)([^<]+)(<)/g, (match, p1, p2, p3) => {
-        if (p2.trim() !== '' && !p2.includes('{') && !p2.includes('}')) {
+        if (p2.trim() !== '') {
           return p1 + wrapText(p2) + p3;
         } else {
           return p1 + p2 + p3;
@@ -104,19 +105,22 @@ function activate(context) {
 
         content = replaceCommonSigns(content);
 
-        const replacedContents = wrapTextNodesWithBladeDirective(content);
-        console.log(content);
+        var replacedContents = wrapTextNodesWithBladeDirective(content);
+
+        replacedContents = undoReplaceCommonSigns(replacedContents);
+        
+        console.log(replacedContents);
 
         // Replace content
         const edit = new vscode.WorkspaceEdit();
-        // edit.replace(
-        //   document.uri,
-        //   new vscode.Range(
-        //     document.positionAt(0), // Start of the content
-        //     document.positionAt(content.length) // End of the content
-        //   ),
-        //   replacedContents
-        // );
+        edit.replace(
+          document.uri,
+          new vscode.Range(
+            document.positionAt(0), // Start of the content
+            document.positionAt(content.length) // End of the content
+          ),
+          replacedContents
+        );
 
         vscode.workspace.applyEdit(edit).then(() => {
           vscode.window.showInformationMessage(
