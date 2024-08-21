@@ -1,6 +1,8 @@
 
 const vscode = require("vscode");
 
+const scapSections = [];
+
 
 function replaceCommonSigns(content) {
   content = content.replace(/{{(.*?)}}/g, function (match, p1) {
@@ -23,20 +25,35 @@ function undoReplaceCommonSigns(content) {
   return content;
 }
 
+function extractScapSections(bladeSource) {
+  let placeholderIndex = 0;
+
+  // Regex to capture everything inside <script>...</script>, including the tags
+  const scriptRegex = /<(script|style)[\s\S]*?<\/\1>/gi;
+
+  // Replace matched <script> sections with placeholders and store them in an array
+  const modifiedBladeSource = bladeSource.replace(scriptRegex, (match) => {
+    const placeholder = `<!-- SCRIPT_PLACEHOLDER_${placeholderIndex} -->`;
+    scapSections.push(match);
+    placeholderIndex++;
+    return placeholder;
+  });
+
+  return { modifiedBladeSource, scapSections };
+}
+
+function restoreScapSections(modifiedBladeSource, scapSections) {
+  return scapSections.reduce((source, script, index) => {
+    const placeholder = `<!-- SCRIPT_PLACEHOLDER_${index} -->`;
+    return source.replace(placeholder, script);
+  }, modifiedBladeSource);
+}
+
 
 
 
 function wrapTextNodesWithBladeDirective(bladeSource) {
   if (!bladeSource) return '';
-
-  // Helper function to wrap text nodes
-  // function wrapText(text) {
-  //   // Trim the text and replace special characters
-  //   let trim_data = text.trim()
-  //     .replace(/[',.]/g, '');
-
-  //   return `{{ __('${trim_data}') }}`;
-  // }
 
   function wrapText(content) {
     return content.replace(/(\s*)([^{}]+?)(\s*)(?={{|$)/g, function (match, leadingSpace, staticText, trailingSpace) {
@@ -55,19 +72,11 @@ function wrapTextNodesWithBladeDirective(bladeSource) {
   // Find all Blade directives to maintain the original order
   const directives = [...bladeSource.matchAll(bladeDirectiveRegex)].map(match => match[0]);
 
-  // Helper function to check if we are inside <script>, <style>, @push or @endpush
-  function isInsideNoWrapSection(part) {
-    const scriptStyleRegex = /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|@push[\s\S]*?@endpush/g;
-    return scriptStyleRegex.test(part);
-  }
-
   let result = '';
 
   // Process each part
   parts.forEach((part, index) => {
-    if (isInsideNoWrapSection(part)) {
-      result += part;
-    } else {
+
       // Wrap each text node within the part
       const wrappedPart = part.replace(/(>)([^<]+)(<)/g, (match, p1, p2, p3) => {
         if (p2.trim() !== '') {
@@ -78,7 +87,6 @@ function wrapTextNodesWithBladeDirective(bladeSource) {
       });
 
       result += wrappedPart;
-    }
 
     // Add the corresponding Blade directive back
     if (index < directives.length) {
@@ -104,20 +112,21 @@ function activate(context) {
         var content = document.getText();
 
         content = replaceCommonSigns(content);
+        content = extractScapSections(content).modifiedBladeSource;
+     
 
         var replacedContents = wrapTextNodesWithBladeDirective(content);
-
-        replacedContents = undoReplaceCommonSigns(replacedContents);
         
-        console.log(replacedContents);
-
+        replacedContents = undoReplaceCommonSigns(replacedContents);
+        replacedContents = restoreScapSections(replacedContents, scapSections);
+        
         // Replace content
         const edit = new vscode.WorkspaceEdit();
         edit.replace(
           document.uri,
           new vscode.Range(
             document.positionAt(0), // Start of the content
-            document.positionAt(content.length) // End of the content
+            document.positionAt(document.getText().length) // End of the content
           ),
           replacedContents
         );
