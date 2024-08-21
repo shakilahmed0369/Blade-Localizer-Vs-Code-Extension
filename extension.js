@@ -57,11 +57,18 @@ function wrapTextNodesWithBladeDirective(bladeSource) {
 
   function wrapText(content) {
     return content.replace(/(\s*)([^{}]+?)(\s*)(?={{|$)/g, function (match, leadingSpace, staticText, trailingSpace) {
-      // Only wrap the static text and leave the spaces as they are
+      // Trim the static text and remove special characters
       staticText = staticText.trim().replace(/[',.]/g, '');
-      return `${leadingSpace}{{ __('${staticText}') }}${trailingSpace}`;
+  
+      // Only wrap if staticText is not empty
+      if (staticText !== '') {
+        return `${leadingSpace}{{ __('${staticText}') }}${trailingSpace}`;
+      } else {
+        return match; // Return the original match without wrapping
+      }
     });
   }
+  
 
   // Match Blade directives
   const bladeDirectiveRegex = /@\w+(?:\([^)]*\))?/g;
