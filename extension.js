@@ -1,7 +1,7 @@
 
 const vscode = require("vscode");
 
-const scapSections = [];
+var scapSections = [];
 
 
 function replaceCommonSigns(content) {
@@ -27,6 +27,8 @@ function undoReplaceCommonSigns(content) {
 
 function extractScapSections(bladeSource) {
   let placeholderIndex = 0;
+
+  scapSections = [];
 
   // Regex to capture everything inside <script>...</script>, including the tags
   const scriptRegex = /<(script|style)[\s\S]*?<\/\1>/gi;
