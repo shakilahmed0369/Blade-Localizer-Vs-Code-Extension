@@ -1,9 +1,11 @@
 # Change Log
 
-All notable changes to the "localizer" extension will be documented in this file.
+## [3.1.2] - YYYY-MM-DD  
+### Fixed  
+- Resolved an issue where the tool did not work with Blade component file content.  
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+### Improved  
+- Enhanced text selection accuracy for better static text identification.  
 
-## [Unreleased]
-
-- Initial release
+### Changed  
+- Optimized code for improved performance and maintainability. 
