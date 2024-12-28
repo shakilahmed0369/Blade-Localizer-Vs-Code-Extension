@@ -8,7 +8,7 @@ This extension will help you to auto-select all your blade static strings and wr
 
 ## Screenshot
   
-<img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWllZ2I4NGJseWg1ZXMxdnp0aWs1cTRjbTc4cmhnZDNiZHN6aDBtYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6hCfe2hlEcnpCBtjLJ/giphy.gif" width="100%" />
+<img src="https://raw.githubusercontent.com/shakilahmed0369/Blade-Localizer-Vs-Code-Extension/refs/heads/master/images/laravel-blade-localizer.gif" width="100%" />
 
 ## Features
 
