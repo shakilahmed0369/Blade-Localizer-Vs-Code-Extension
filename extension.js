@@ -3,13 +3,17 @@ const vscode = require("vscode");
 let scapSections = [];
 
 function replaceCommonSigns(content) {
-  return content.replace(/{{(.*?)}}/g, (match, p1) => {
+  return content
+  .replace(/->/g, '&dash_gt;')
+  .replace(/{{(.*?)}}/g, (match, p1) => {
     return `{{${p1.replace(/</g, '&lt;').replace(/>/g, '&gt;')}}}`;
   });
 }
 
 function undoReplaceCommonSigns(content) {
-  return content.replace(/{{(.*?)}}/g, (match, p1) => {
+  return content
+  .replace(/&dash_gt;/g, '->')
+  .replace(/{{(.*?)}}/g, (match, p1) => {
     return `{{${p1.replace(/&lt;/g, '<').replace(/&gt;/g, '>')}}}`;
   });
 }
