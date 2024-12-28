@@ -5,6 +5,8 @@ let scapSections = [];
 function replaceCommonSigns(content) {
   return content
   .replace(/->/g, '&dash_gt;')
+  .replace(/=>/g, '&eqgt;')
+  .replace(/<=/g, '&lteq;')
   .replace(/{{(.*?)}}/g, (match, p1) => {
     return `{{${p1.replace(/</g, '&lt;').replace(/>/g, '&gt;')}}}`;
   });
@@ -13,6 +15,8 @@ function replaceCommonSigns(content) {
 function undoReplaceCommonSigns(content) {
   return content
   .replace(/&dash_gt;/g, '->')
+  .replace(/&eqgt;/g, '=>')
+  .replace(/&lteq;/g, '<=')
   .replace(/{{(.*?)}}/g, (match, p1) => {
     return `{{${p1.replace(/&lt;/g, '<').replace(/&gt;/g, '>')}}}`;
   });
