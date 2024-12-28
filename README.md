@@ -7,10 +7,7 @@
 This extension will help you to auto-select all your blade static strings and wrap those into localization syntax.
 
 ## Screenshot
-
-<div align="center" width="200">
-  <img src="https://raw.githubusercontent.com/shakilahmed0369/public-cdn-files/main/uploads/Screencastfrom2024-08-1401-50-58-ezgif.com-video-to-gif-converter.gif" alt="banner">
-</div>
+  ![](https://github.com/shakilahmed0369/Blade-Localizer-Vs-Code-Extension/blob/master/images/laravel-blade-localizer.gif)
 
 ## Features
 
