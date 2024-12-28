@@ -4,7 +4,7 @@
   "description": "A vs code extension to wrap blade static texts in laravel localization syntax.",
   "publisher": "ShakilAhmed",
   "icon": "images/icon.png",
-  "version": "2.1.2",
+  "version": "3.1.0",
   "engines": {
     "vscode": "^1.84.0"
   },
